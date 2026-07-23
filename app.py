@@ -1,4 +1,4 @@
-himport os
+import os
 import asyncio
 import time
 import edge_tts
@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 from groq import Groq
 
 app = Flask(__name__)
-application = app
 client = Groq()
 
 # ==========================================
