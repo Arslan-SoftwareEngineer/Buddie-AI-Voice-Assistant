@@ -1,0 +1,222 @@
+/* =========================================
+   Global Reset & Theme
+   ========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Clean dark gradient background */
+    background: radial-gradient(circle at center, #1a202c 0%, #11141a 100%);
+    color: #e2e8f0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* =========================================
+   Main Centered Layout
+   ========================================= */
+.main-layout {
+    width: 100%;
+    max-width: 600px; /* Aligned and centered */
+    height: 90vh;     /* Standard modern height */
+    background-color: rgba(25, 30, 41, 0.95);
+    border: 1px solid #2d3748;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Header styling */
+header {
+    padding: 20px 25px;
+    background-color: #1a202c;
+    border-bottom: 1px solid #2d3748;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+h1 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #4CAF50; /* Green primary color */
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #555; /* Default gray */
+}
+
+.status-dot.online { background-color: #4CAF50; box-shadow: 0 0 5px #4CAF50; }
+.status-dot.recording { background-color: #f56565; box-shadow: 0 0 5px #f56565; animation: pulse 1s infinite; }
+.status-dot.thinking { background-color: #ed8936; box-shadow: 0 0 5px #ed8936; animation: pulse 1.5s infinite; }
+
+#main-status {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+/* =========================================
+   The Chat Interface (The heavy lifting)
+   ========================================= */
+.chat-viewport {
+    flex: 1;
+    padding: 25px;
+    overflow-y: auto; /* Enable scrolling */
+    background-color: #11141a;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Standard message row container (full width flex) */
+.chat-message {
+    width: 100%;
+    display: flex;
+    margin-bottom: 20px;
+}
+
+/* User Message - Align Right */
+.chat-message.user {
+    justify-content: flex-end;
+}
+
+/* AI Message - Align Left */
+.chat-message.ai {
+    justify-content: flex-start;
+}
+
+/* The actual bubble styling */
+.message-bubble {
+    max-width: 75%;
+    padding: 12px 18px;
+    border-radius: 18px;
+    font-size: 1rem;
+    line-height: 1.5;
+    position: relative;
+}
+
+/* Bubble colors/styles */
+.chat-message.user .message-bubble {
+    background: linear-gradient(135deg, #4CAF50 0%, #388e3c 100%);
+    color: #ffffff;
+    border-bottom-right-radius: 4px; /* Tip pointing right */
+}
+
+.chat-message.ai .message-bubble {
+    background-color: #2d3748;
+    color: #edf2f7;
+    border-top-left-radius: 4px; /* Tip pointing left */
+}
+
+/* =========================================
+   Footer & Primary Button
+   ========================================= */
+footer {
+    padding: 20px 25px;
+    background-color: #1a202c;
+    border-top: 1px solid #2d3748;
+    display: flex;
+    justify-content: center;
+}
+
+/* =========================================
+   Circular Microphone Button
+   ========================================= */
+.btn-mic {
+    background: linear-gradient(135deg, #4CAF50 0%, #388e3c 100%);
+    color: white;
+    border: none;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-mic svg {
+    width: 28px;
+    height: 28px;
+}
+
+.btn-mic:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+.btn-mic:disabled {
+    background: #4a5568;
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+}
+
+/* State Colors */
+.btn-mic.recording {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    box-shadow: 0 4px 15px rgba(245, 101, 101, 0.5);
+    animation: recording-pulse 1.5s infinite;
+}
+
+.btn-mic.thinking {
+    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    box-shadow: 0 4px 15px rgba(237, 137, 54, 0.5);
+}
+
+/* Stop Button */
+.btn-stop {
+    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+    color: white;
+    border: none;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
+}
+
+.btn-stop svg {
+    width: 24px;
+    height: 24px;
+}
+
+.btn-stop:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(245, 101, 101, 0.5);
+}
+
+.btn-stop:disabled {
+    background: #4a5568;
+    box-shadow: none;
+    transform: none;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Simple Animations */
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+@keyframes recording-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
