@@ -3,7 +3,6 @@ import asyncio
 import time
 import edge_tts
 from flask import Flask, render_template, request, jsonify
-from dotenv import load_dotenv
 from groq import Groq
 
 app = Flask(__name__)
