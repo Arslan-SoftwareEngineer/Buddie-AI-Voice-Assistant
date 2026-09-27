@@ -1,4 +1,6 @@
 import os
+import json
+import base64
 import asyncio
 import time
 import edge_tts
@@ -20,14 +22,19 @@ def listen_to_audio(file_path):
     return transcription.text
 
 # ==========================================
-# 2. Response Function (LLM)
+# 2. Response Function (LLM with History)
 # ==========================================
-def generate_ai_response(user_text):
+def generate_ai_response(user_text, history):
+    system_prompt = {
+        "role": "system",
+        "content": "You are Buddie, a concise, friendly voice assistant. Keep answers conversational, clear, and under 2-3 sentences."
+    }
+    
+    # Merge system prompt, prior context, and current user input
+    messages = [system_prompt] + history + [{"role": "user", "content": user_text}]
+
     chat_completion = client.chat.completions.create(
-        messages=[
-            {"role": "system", "content": "You are a helpful, concise AI voice assistant."},
-            {"role": "user", "content": user_text}
-        ],
+        messages=messages,
         model="llama-3.3-70b-versatile",
     )
     return chat_completion.choices[0].message.content
@@ -36,14 +43,14 @@ def generate_ai_response(user_text):
 # 3. Speaking Function (Text-to-Speech)
 # ==========================================
 def speak_text(text):
-    filename = f"/tmp/response_{int(time.time())}.mp3"
+    filename = f"/tmp/response_{int(time.time() * 1000)}.mp3"
     communicate = edge_tts.Communicate(text, "en-US-AriaNeural")
     asyncio.run(communicate.save(filename))
     
     with open(filename, "rb") as audio_file:
         base64_audio = base64.b64encode(audio_file.read()).decode('utf-8')
         
-    os.remove(filename) # Clean up
+    os.remove(filename)  # Clean up
     return f"data:audio/mp3;base64,{base64_audio}"
     
 # ==========================================
@@ -58,15 +65,24 @@ def chat():
     if 'audio' not in request.files:
         return jsonify({"error": "No audio file provided"}), 400
 
+    # Parse incoming conversation history from FormData
+    raw_history = request.form.get("history", "[]")
+    try:
+        history = json.loads(raw_history)
+    except json.JSONDecodeError:
+        history = []
+
     audio_file = request.files['audio']
-    file_path = f"/tmp/temp_audio_{int(time.time())}.webm"
+    file_path = f"/tmp/temp_audio_{int(time.time() * 1000)}.webm"
     audio_file.save(file_path)
     
-    user_text = listen_to_audio(file_path)
-    ai_text = generate_ai_response(user_text)
-    audio_url = speak_text(ai_text) 
-
-    os.remove(file_path) # Clean up
+    try:
+        user_text = listen_to_audio(file_path)
+        ai_text = generate_ai_response(user_text, history)
+        audio_url = speak_text(ai_text)
+    finally:
+        if os.path.exists(file_path):
+            os.remove(file_path)  # Always clean up temp audio
 
     return jsonify({
         "user_text": user_text,

@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     let mediaRecorder;
     let audioChunks = [];
+    let chatHistory = []; // Tracks rolling multi-turn context
 
     const recordBtn = document.getElementById('recordBtn');
     const stopBtn = document.getElementById('stopBtn');
@@ -24,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setStatus(state, message) {
-        // Added safety checks to prevent 'null' crashes
         if (statusDot) {
             statusDot.className = 'status-dot';
             statusDot.classList.add(state);
@@ -61,6 +61,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     
                     const formData = new FormData();
                     formData.append('audio', audioBlob, 'recording.webm');
+                    // Send conversation history to the backend
+                    formData.append('history', JSON.stringify(chatHistory));
                     
                     try {
                         const response = await fetch('/api/chat', {
@@ -68,15 +70,29 @@ document.addEventListener("DOMContentLoaded", () => {
                             body: formData
                         });
                         
-                        // THIS WAS THE MISSING LINE CAUSING THE CRASH!
                         const data = await response.json();
                         
+                        if (data.error) {
+                            console.error("Backend error:", data.error);
+                            if (mainStatus) mainStatus.textContent = data.error;
+                            resetUI();
+                            return;
+                        }
+
                         appendMessage('user', data.user_text);
                         appendMessage('ai', data.ai_text);
                         
+                        // Update multi-turn history buffer
+                        chatHistory.push({ role: 'user', content: data.user_text });
+                        chatHistory.push({ role: 'assistant', content: data.ai_text });
+
+                        // Maintain a rolling window of the last 8 messages (4 full exchanges)
+                        if (chatHistory.length > 8) {
+                            chatHistory = chatHistory.slice(-8);
+                        }
+
                         setStatus('online', 'Speaking...');
 
-                        // HTML5 Audio Player playback
                         if (player) {
                             player.src = data.audio_url + "?t=" + new Date().getTime();
                             player.load();
@@ -88,11 +104,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             player.onended = () => {
                                 resetUI();
-                                const userInput = data.user_text.toLowerCase();
+                                const userInput = (data.user_text || '').toLowerCase();
                                 if (userInput.includes("exit") || userInput.includes("stop")) {
                                     setStatus('online', 'Conversation ended.');
                                 } else {
-                                    recordBtn.click(); // Auto-restart
+                                    recordBtn.click(); // Continuous conversational loop
                                 }
                             };
                         } else {
