@@ -1,3 +1,7 @@
-Flask
+flask
 groq
 edge-tts
+python-dotenv
+requests
+ddgs
+tzdata

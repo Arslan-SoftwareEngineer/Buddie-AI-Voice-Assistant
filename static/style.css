@@ -1,222 +1,128 @@
-/* =========================================
-   Global Reset & Theme
-   ========================================= */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+:root {
+  --mist: #e7ecef;
+  --paper: #f6f8f9;
+  --ink: #14212b;
+  --ink-soft: #4b5b68;
+  --line: #cbd5db;
+  --stage: #0d1b26;
+  --teal: #3ddbc0;
+  --violet: #9a8cff;
+  --alert: #b4400c;
+  --radius: 12px;
+  font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    /* Clean dark gradient background */
-    background: radial-gradient(circle at center, #1a202c 0%, #11141a 100%);
-    color: #e2e8f0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--mist); color: var(--ink); font-size: 16px; line-height: 1.5; }
+
+button, select, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: 260px 1fr; height: 100%; }
+
+/* ---------- Sessions sidebar ---------- */
+.sessions {
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 16px; background: var(--paper); border-right: 1px solid var(--line);
+  overflow-y: auto;
+}
+.sessions ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sessions li { display: flex; align-items: center; border-radius: 10px; }
+.sessions li.active { background: #dde5ea; }
+.sessions li .open {
+  flex: 1; min-width: 0; text-align: left; background: none; border: 0; padding: 8px 10px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border-radius: 10px;
+}
+.sessions li .del { background: none; border: 0; padding: 6px 10px; color: var(--ink-soft); border-radius: 10px; }
+.sessions li .del:hover { color: var(--alert); }
+.hint { margin: 0; font-size: 13px; color: var(--ink-soft); }
+
+/* ---------- Main column ---------- */
+main { display: flex; flex-direction: column; gap: 14px; padding: 16px 20px; min-width: 0; height: 100%; }
+
+.bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bar h1 { margin: 0 auto 0 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+.bar label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-soft); }
+.bar select {
+  background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+  padding: 6px 8px; color: var(--ink);
+}
+#toggleSessions { display: none; }
+
+.primary, .ghost, .signal { border-radius: 10px; padding: 8px 14px; border: 1px solid transparent; font-weight: 500; }
+.primary { background: var(--ink); color: var(--paper); }
+.primary:hover { background: #22364a; }
+.ghost { background: var(--paper); border-color: var(--line); }
+.ghost:hover { background: #dde5ea; }
+
+/* ---------- Stage (the waveform) ---------- */
+.stage {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 14px 16px 18px; background: var(--stage); color: #dbe7ee; border-radius: 20px;
+}
+#wave { width: 100%; height: 150px; display: block; }
+#status { margin: 0; min-height: 1.5em; font-size: 15px; text-align: center; }
+.signal { background: var(--teal); color: #05211c; padding: 10px 22px; font-weight: 700; }
+.signal:hover { filter: brightness(1.08); }
+.stage[data-state="speaking"] .signal { background: var(--violet); color: #14103a; }
+.stage[data-state="error"] #status { color: #ffb48a; }
+
+/* ---------- Conversation ---------- */
+.log { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 4px 2px; }
+.empty { margin: auto; color: var(--ink-soft); text-align: center; max-width: 36ch; }
+.msg { max-width: min(720px, 88%); padding: 10px 14px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.user { align-self: flex-end; background: var(--ink); color: var(--paper); }
+.msg.assistant { align-self: flex-start; background: var(--paper); border: 1px solid var(--line); }
+.msg .tool { display: block; margin-bottom: 4px; font-size: 13px; color: var(--ink-soft); }
+.msg.error { border-color: var(--alert); color: var(--alert); }
+
+.composer { display: flex; gap: 8px; }
+.composer input {
+  flex: 1; min-width: 0; background: var(--paper); border: 1px solid var(--line);
+  border-radius: 10px; padding: 9px 12px;
 }
 
-/* =========================================
-   Main Centered Layout
-   ========================================= */
-.main-layout {
-    width: 100%;
-    max-width: 600px; /* Aligned and centered */
-    height: 90vh;     /* Standard modern height */
-    background-color: rgba(25, 30, 41, 0.95);
-    border: 1px solid #2d3748;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    position: relative;
+/* ---------- Mobile ---------- */
+@media (max-width: 800px) {
+  .app { grid-template-columns: 1fr; }
+  .sessions {
+    position: fixed; inset: 0 auto 0 0; width: min(300px, 86vw); z-index: 10;
+    transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: 4px 0 24px rgba(0, 0, 0, 0.2);
+  }
+  .app.drawer-open .sessions { transform: none; }
+  #toggleSessions { display: inline-block; }
+  main { padding: 12px; }
+  .bar h1 { font-size: 24px; }
 }
 
-/* Header styling */
-header {
-    padding: 20px 25px;
-    background-color: #1a202c;
-    border-bottom: 1px solid #2d3748;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+@media (prefers-reduced-motion: reduce) {
+  .sessions { transition: none; }
 }
 
-.logo-area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+/* ---------- Mic button ---------- */
+.mic {
+  width: 64px; height: 64px; border-radius: 50%; border: 0; padding: 0;
+  display: grid; place-items: center; background: var(--teal); color: #05211c;
 }
+.mic:hover { filter: brightness(1.08); }
+.mic .icon-stop { display: none; }
+.mic[data-mode="busy"] .icon-mic { display: none; }
+.mic[data-mode="busy"] .icon-stop { display: block; }
+.mic[data-mode="listening"] { box-shadow: 0 0 0 6px rgba(61, 219, 192, 0.25), 0 0 24px rgba(61, 219, 192, 0.6); }
+.stage[data-state="speaking"] .mic { background: var(--violet); color: #14103a; }
+.stage[data-state="hearing"] { box-shadow: 0 0 0 3px var(--teal), 0 0 32px rgba(61, 219, 192, 0.45); }
 
-h1 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #4CAF50; /* Green primary color */
-}
+/* ---------- Layout: full-height app ---------- */
+html, body { height: 100dvh; }
+.app { height: 100dvh; }
+main { height: 100dvh; min-height: 0; }
+.stage { min-height: 0; }
 
-.status-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #555; /* Default gray */
-}
-
-.status-dot.online { background-color: #4CAF50; box-shadow: 0 0 5px #4CAF50; }
-.status-dot.recording { background-color: #f56565; box-shadow: 0 0 5px #f56565; animation: pulse 1s infinite; }
-.status-dot.thinking { background-color: #ed8936; box-shadow: 0 0 5px #ed8936; animation: pulse 1.5s infinite; }
-
-#main-status {
-    font-size: 0.9rem;
-    color: #718096;
-}
-
-/* =========================================
-   The Chat Interface (The heavy lifting)
-   ========================================= */
-.chat-viewport {
-    flex: 1;
-    padding: 25px;
-    overflow-y: auto; /* Enable scrolling */
-    background-color: #11141a;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Standard message row container (full width flex) */
-.chat-message {
-    width: 100%;
-    display: flex;
-    margin-bottom: 20px;
-}
-
-/* User Message - Align Right */
-.chat-message.user {
-    justify-content: flex-end;
-}
-
-/* AI Message - Align Left */
-.chat-message.ai {
-    justify-content: flex-start;
-}
-
-/* The actual bubble styling */
-.message-bubble {
-    max-width: 75%;
-    padding: 12px 18px;
-    border-radius: 18px;
-    font-size: 1rem;
-    line-height: 1.5;
-    position: relative;
-}
-
-/* Bubble colors/styles */
-.chat-message.user .message-bubble {
-    background: linear-gradient(135deg, #4CAF50 0%, #388e3c 100%);
-    color: #ffffff;
-    border-bottom-right-radius: 4px; /* Tip pointing right */
-}
-
-.chat-message.ai .message-bubble {
-    background-color: #2d3748;
-    color: #edf2f7;
-    border-top-left-radius: 4px; /* Tip pointing left */
-}
-
-/* =========================================
-   Footer & Primary Button
-   ========================================= */
-footer {
-    padding: 20px 25px;
-    background-color: #1a202c;
-    border-top: 1px solid #2d3748;
-    display: flex;
-    justify-content: center;
-}
-
-/* =========================================
-   Circular Microphone Button
-   ========================================= */
-.btn-mic {
-    background: linear-gradient(135deg, #4CAF50 0%, #388e3c 100%);
-    color: white;
-    border: none;
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
-}
-
-.btn-mic svg {
-    width: 28px;
-    height: 28px;
-}
-
-.btn-mic:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
-}
-
-.btn-mic:disabled {
-    background: #4a5568;
-    box-shadow: none;
-    transform: none;
-    cursor: not-allowed;
-}
-
-/* State Colors */
-.btn-mic.recording {
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-    box-shadow: 0 4px 15px rgba(245, 101, 101, 0.5);
-    animation: recording-pulse 1.5s infinite;
-}
-
-.btn-mic.thinking {
-    background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
-    box-shadow: 0 4px 15px rgba(237, 137, 54, 0.5);
-}
-
-/* Stop Button */
-.btn-stop {
-    background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
-    color: white;
-    border: none;
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
-}
-
-.btn-stop svg {
-    width: 24px;
-    height: 24px;
-}
-
-.btn-stop:hover:not(:disabled) {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 6px 20px rgba(245, 101, 101, 0.5);
-}
-
-.btn-stop:disabled {
-    background: #4a5568;
-    box-shadow: none;
-    transform: none;
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-/* Simple Animations */
-@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-@keyframes recording-pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+/* ---------- Voice-only layout: the stage fills the whole screen ---------- */
+main.voice-only .stage { flex: 1 1 0; justify-content: center; gap: 18px; }
+main.voice-only #wave { flex: 1 1 0; min-height: 0; height: auto; }
+main.voice-only #status { font-size: 18px; }
+main.voice-only .log,
+main.voice-only .composer { display: none; }
