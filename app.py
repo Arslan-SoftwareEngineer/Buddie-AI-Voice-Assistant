@@ -12,7 +12,9 @@ from groq import Groq
 
 load_dotenv(override=True)  # .env wins over any stale GROQ_API_KEY set in the OS
 
-app = Flask(__name__)
+# Static files live in public/ because Vercel only serves that folder (it ignores Flask's static_folder).
+# static_url_path="" makes Flask serve the same files at the site root locally.
+app = Flask(__name__, static_folder="public", static_url_path="")
 client = Groq()  # reads GROQ_API_KEY from the environment
 
 LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-oss-120b")  # override in .env if Groq renames it

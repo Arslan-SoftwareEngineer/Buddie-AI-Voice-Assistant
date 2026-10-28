@@ -88,7 +88,7 @@ Buddie-AI-Voice-Assistant/
 ├── app.py               # Flask backend: STT, streaming LLM loop, tools, TTS
 ├── templates/
 │   └── index.html       # Page markup
-├── static/
+├── public/              # Static files (served from here on Vercel and locally)
 │   ├── buddie.js        # VAD, SSE client, audio queue, waveform, sessions, export
 │   └── buddie.css       # Styling
 ├── requirements.txt
